@@ -6,6 +6,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -16,9 +17,14 @@ class BlogApi {
         }
     }
 
-    suspend fun fetchBlogs(): List<Blog> {
-        val url = "https://blog.vrid.in/wp-json/wp/v2/posts?per_page=10&page=2"
+    suspend fun fetchBlogs(loadItem:Int = 10,pageNo:Int=1): List<Blog> {
+        val url = "https://blog.vrid.in/wp-json/wp/v2/posts?per_page=$loadItem&page=$pageNo"
         val response: HttpResponse = client.get(url)
-        return response.body()
+        return try {
+            response.body()
+        } catch (e:Exception) {
+            e.printStackTrace()
+            listOf()
+        }
     }
 }
